@@ -2,8 +2,11 @@ var request = require("request");
 var fs = require("fs");
 var secrets = require("./secrets");
 
+let repoOwner = process.argv[2];
+let repoName = process.argv[3];
+
 function getRepoContributors(repoOwner, repoName, cb) {
-  // ...cd === callback;
+  // ...cb === callback;
   var options = {
     url:
       "https://api.github.com/repos/" +
@@ -16,20 +19,20 @@ function getRepoContributors(repoOwner, repoName, cb) {
       Authorization: "token " + secrets.GITHUB_TOKEN
     }
   };
-  request(url, function(err, res, body) {
+
+function getRepoContributors(repoOwner, repoName, cb) {
     if (repoOwner === undefined || repoName === undefined) {
       console.log("You need to pass both parameters");
     } else {
-      console.log("Welcome to the GitHub Avatar Downloader!");
+        console.log('Welcome to the GitHub Avatar Downloader!');
     }
-  });
-}
+  };
+
 
 getRepoContributors("jquery", "jquery", function(err, result) {
   for (let index = 0; index < result.length; index++) {
     const element = result[index];
+    downloadImageByURL(element.avatar_url, "avatars/" + index + ".jpg");
   }
-  downloadImageByURL(element.avatar_url, "avatars/" + index + ".jpg");
-  console.log("Errors:", err);
-  console.log("Result:", result);
+  console.log("Download complete.");
 });
