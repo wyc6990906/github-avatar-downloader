@@ -2,11 +2,12 @@ var request = require("request");
 var fs = require("fs");
 var token = require("./secrets");
 
-// require("dotenv").config();
-// const { GITHUB_TOKEN } = process.env;
-
 let repoOwner = process.argv[2];
 let repoName = process.argv[3];
+
+if (repoOwner === undefined || repoName === undefined) {
+  console.log("You need to pass both parameters");
+}
 
 function downloadImageByURL(url, filePath) {
   request
@@ -14,7 +15,7 @@ function downloadImageByURL(url, filePath) {
     .on("error", function(err) {
       throw err;
     })
-    .pipe(fs.createWriteStream("filePath"));
+    .pipe(fs.createWriteStream(filePath)); // FILEPATH IS NOT A STRING SO DON;T PUT " " ON THERE!!!!
 }
 
 function getRepoContributors(repoOwner, repoName, cb) {
@@ -40,17 +41,12 @@ function getRepoContributors(repoOwner, repoName, cb) {
   });
 }
 
-if (repoOwner === undefined || repoName === undefined) {
-  console.log("You need to pass both parameters");
-  process.exit();
-}
-
 console.log("Welcome to the GitHub Avatar Downloader!");
 
 getRepoContributors(repoOwner, repoName, function(err, results) {
   for (let index = 0; index < results.length; index++) {
     const result = results[index];
-    downloadImageByURL(result.avatar_url, "avatars/" + result.index + ".jpg");
+    downloadImageByURL(result.avatar_url, "./avatars/" + repoOwner + ".jpg");
   }
   console.log("Download complete.");
 });
