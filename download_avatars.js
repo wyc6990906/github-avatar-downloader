@@ -1,13 +1,27 @@
 var request = require("request");
 var fs = require("fs");
-var secrets = require("./secrets");
-require("dotenv").config();
-const { GITHUB_TOKEN } = process.env;
+var token = require("./secrets");
+
+// require("dotenv").config();
+// const { GITHUB_TOKEN } = process.env;
+
 let repoOwner = process.argv[2];
 let repoName = process.argv[3];
 
+function downloadImageByURL(url, filePath) {
+  request
+    .get(url)
+    .on("error", function(err) {
+      throw err;
+    })
+    .pipe(fs.createWriteStream("filePath"));
+}
+
 function getRepoContributors(repoOwner, repoName, cb) {
-  // ...cb === callback;
+  console.log("Great so you want:");
+  console.log("Repository owner: ", repoOwner);
+  console.log("And the repository: ", repoName);
+
   var options = {
     url:
       "https://api.github.com/repos/" +
@@ -17,23 +31,26 @@ function getRepoContributors(repoOwner, repoName, cb) {
       "/contributors",
     headers: {
       "User-Agent": "request",
-      Authorization: "token " + GITHUB_TOKEN
+      Authorization: "token " + token.GITHUB_TOKEN
     }
   };
+
+  request(options, function(err, res, body) {
+    cb(err, JSON.parse(body));
+  });
 }
 
-function getRepoContributors(repoOwner, repoName, cb) {
-  if (repoOwner === undefined || repoName === undefined) {
-    console.log("You need to pass both parameters");
-  } else {
-    console.log("Welcome to the GitHub Avatar Downloader!");
-  }
+if (repoOwner === undefined || repoName === undefined) {
+  console.log("You need to pass both parameters");
+  process.exit();
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
-  for (let index = 0; index < result.length; index++) {
-    const result = result[index];
-    downloadImageByURL(result.avatar_url, "avatars/" + index + ".jpg");
+console.log("Welcome to the GitHub Avatar Downloader!");
+
+getRepoContributors(repoOwner, repoName, function(err, results) {
+  for (let index = 0; index < results.length; index++) {
+    const result = results[index];
+    downloadImageByURL(result.avatar_url, "avatars/" + result.index + ".jpg");
   }
   console.log("Download complete.");
 });
