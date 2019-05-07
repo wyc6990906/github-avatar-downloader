@@ -1,1 +1,1 @@
-# github-avatar-downloader object for Dylan
+# github-avatar-downloader project for Dylan Wang
